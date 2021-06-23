@@ -26,15 +26,11 @@ class PPO:
         for worker in self.workers:
             procs.append(mp.Process(target=worker.run, args=(n_episodes, self.episodes_queue)))
         ewq = time()
-        print("-"*100)
-        print(ewq - qwe)
-        print("-" * 100)
         for proc in procs:
             proc.start()
-        print("STARTED")
         for proc in procs:
+            print("JOINED")
             proc.join()
-        print("JOINED")
 
         episodes = list()
         for i in procs:
