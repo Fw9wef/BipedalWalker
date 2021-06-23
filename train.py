@@ -1,7 +1,6 @@
 from ppo import PPO
 from settings import *
 import torch.multiprocessing as mp
-mp.set_start_method('spawn')
 
 
 def main():
@@ -10,4 +9,5 @@ def main():
 
 
 if __name__ == "__main__":
+    mp.set_start_method('spawn')
     main()
