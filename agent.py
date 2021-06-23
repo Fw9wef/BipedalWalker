@@ -111,7 +111,9 @@ class Actor(object):
         return episode
 
     def run(self, n_episodes=10, queue=None):
+        print(1)
         episodes = [self.run_episode() for _ in range(n_episodes)]
+        print(2)
         if queue is None:
             return episodes
         else:
