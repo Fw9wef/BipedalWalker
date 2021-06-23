@@ -27,8 +27,10 @@ class PPO:
         for proc in procs:
             proc.join()
 
+        print(1231231231)
         episodes = list()
-        for _ in procs:
+        for i in procs:
+            print(i)
             episodes += self.episodes_queue.get()
         return episodes
 
