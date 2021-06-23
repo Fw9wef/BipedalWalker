@@ -1,7 +1,6 @@
 from agent import Actor
 from env import *
 import torch.multiprocessing as mp
-mp.set_start_method('spawn')
 
 
 class PPO:
