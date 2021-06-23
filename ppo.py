@@ -1,6 +1,7 @@
 from agent import Actor
 from env import *
 import torch.multiprocessing as mp
+from time import time
 
 
 class PPO:
@@ -20,14 +21,21 @@ class PPO:
 
     def gather_episodes(self, n_episodes):
         procs = list()
+
+        qwe = time()
         for worker in self.workers:
             procs.append(mp.Process(target=worker.run, args=(n_episodes, self.episodes_queue)))
+        ewq = time()
+        print("-"*100)
+        print(ewq - qwe)
+        print("-" * 100)
         for proc in procs:
             proc.start()
+        print("STARTED")
         for proc in procs:
             proc.join()
+        print("JOINED")
 
-        print(1231231231)
         episodes = list()
         for i in procs:
             print(i)
