@@ -26,6 +26,7 @@ class PPO:
             proc.start()
         for proc in procs:
             proc.join()
+        print("PPO ready")
 
     def gather_episodes(self, n_episodes):
         procs = list()
