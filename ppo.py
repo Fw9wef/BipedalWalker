@@ -25,6 +25,12 @@ class PPO:
         for proc in procs:
             proc.start()
         for proc in procs:
+            proc.join()
+        for worker in self.workers[1:]:
+            procs.append(mp.Process(target=worker.sync_nets, args=(policy_state_dict, value_state_dict)))
+        for proc in procs:
+            proc.start()
+        for proc in procs:
             print("Joined")
             proc.join()
 
