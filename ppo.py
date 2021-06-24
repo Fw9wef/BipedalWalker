@@ -12,30 +12,24 @@ class PPO:
         self.lam = lam
         self.gamma = gamma
         self.epsilon = epsilon
-        self.episodes_queue = mp.Queue()
-        self.grads_queue = mp.Queue()
+        self.receive_conns = list()
         self.workers = list()
         for gpu in self.gpus:
             for _ in range(self.per_gpu_workers):
-                self.workers.append(Actor(gpu_id=gpu, l=self.lam, gamma=self.gamma, epsilon=self.epsilon))
+                rcv, snd = mp.Pipe(False)
+                self.workers.append(Actor(gpu_id=gpu, l=self.lam, gamma=self.gamma,
+                                          epsilon=self.epsilon, send_conn=snd))
+                self.receive_conns.append(rcv)
+
         policy_state_dict, value_state_dict = self.workers[0].get_weights()
-        procs = list()
-        qwe = time()
         for worker in self.workers[1:]:
             worker.sync_nets(policy_state_dict, value_state_dict)
-        asd = time()
-        print(asd - qwe)
-        #    procs.append(mp.Process(target=worker.sync_nets, args=(policy_state_dict, value_state_dict)))
-        #for proc in procs:
-        #    proc.start()
-        #for proc in procs:
-        #    proc.join()
 
     def gather_episodes(self, n_episodes):
         procs = list()
 
         for worker in self.workers:
-            procs.append(mp.Process(target=worker.run, args=(n_episodes, self.episodes_queue)))
+            procs.append(mp.Process(target=worker.run, args=(n_episodes,)))
         for proc in procs:
             proc.start()
         for proc in procs:
@@ -45,7 +39,7 @@ class PPO:
         episodes = list()
         for i in procs:
             print(i)
-            episodes += self.episodes_queue.get()
+            episodes += self.receive_conns[i].recv()
         return episodes
 
     def gather_gradients(self, batch):
@@ -53,7 +47,7 @@ class PPO:
         batches = [batch[i*per_worker_batch:(i+1)*per_worker_batch] for i in range(self.n_workers)]
         procs = list()
         for mini_batch, worker in zip(batches, self.workers):
-            procs.append(mp.Process(target=worker.get_grads, args=(mini_batch, self.grads_queue)))
+            procs.append(mp.Process(target=worker.get_grads, args=(mini_batch,)))
         for proc in procs:
             proc.start()
         for proc in procs:
@@ -61,8 +55,8 @@ class PPO:
 
         policy_grads = list()
         value_grads = list()
-        for _ in procs:
-            p_grad, v_grad = self.grads_queue.get()
+        for i, _ in enumerate(procs):
+            p_grad, v_grad = self.receive_conns[i].recv()
             policy_grads.append(p_grad)
             value_grads.append(v_grad)
         return policy_grads, value_grads
@@ -70,13 +64,8 @@ class PPO:
     def update_and_spread(self, policy_grads, value_grads):
         self.workers[0].apply_grads(policy_grads, value_grads)
         policy_state_dict, value_state_dict = self.workers[0].get_weights()
-        procs = list()
         for worker in self.workers[1:]:
-            procs.append(mp.Process(target=worker.sync_nets, args=(policy_state_dict, value_state_dict)))
-        for proc in procs:
-            proc.start()
-        for proc in procs:
-            proc.join()
+            worker.sync_nets(policy_state_dict, value_state_dict)
 
     def train(self, iterations, ppo_epochs, batch_size, n_batch,  n_episodes):
         for iteration in range(1, iterations + 1):

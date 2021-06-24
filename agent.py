@@ -52,7 +52,7 @@ class A2C_value(nn.Module):
 class Actor(object):
 
     def __init__(self, actor_net=None, critic_net=None, env_name="BipedalWalker-v3", gpu_id=0,
-                 max_iters=1600, l=0.95, gamma=0.99, epsilon=0.2):
+                 max_iters=1600, l=0.95, gamma=0.99, epsilon=0.2, send_conn=None):
 
         self.device = torch.device("cuda:" + str(gpu_id))
         self.env = gym.make(env_name)
@@ -60,6 +60,7 @@ class Actor(object):
         self.l = l
         self.gamma = gamma
         self.epsilon = epsilon
+        self.send_conn = send_conn
 
         if actor_net is None:
             self.policy = A2C_policy(self.env.observation_space.shape, self.env.action_space.shape)
@@ -110,12 +111,12 @@ class Actor(object):
         episode.compute_advantages()
         return episode
 
-    def run(self, n_episodes=10, queue=None):
+    def run(self, n_episodes=10):
         episodes = [self.run_episode() for _ in range(n_episodes)]
-        if queue is None:
+        if self.send_conn is None:
             return episodes
         else:
-            queue.put(episodes)
+            self.send_conn.send(episodes)
 
 
     def run_n_steps(self, n_steps):
@@ -192,10 +193,10 @@ class Actor(object):
         for param in self.value.parameters():
             value_grads.append(torch.Tensor(param.grad.cpu()))
 
-        if queue is None:
+        if self.send_conn is None:
             return policy_grads, value_grads
         else:
-            queue.put((policy_grads, value_grads))
+            self.send_conn.send((policy_grads, value_grads))
 
     def apply_grads(self, policy_grads, value_grads):
         self.policy_optimizer.zero_grad()
