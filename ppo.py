@@ -33,12 +33,11 @@ class PPO:
         for proc in procs:
             proc.start()
         for proc in procs:
-            print("JOINED")
             proc.join()
 
         episodes = list()
         for i in procs:
-            print(i)
+            print(self.receive_conns[i].recv())
             episodes += self.receive_conns[i].recv()
         return episodes
 
