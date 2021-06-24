@@ -16,7 +16,7 @@ class PPO:
         self.workers = list()
         for gpu in self.gpus:
             for _ in range(self.per_gpu_workers):
-                rcv, snd = mp.Pipe(False)
+                rcv, snd = mp.Pipe()
                 self.workers.append(Actor(gpu_id=gpu, l=self.lam, gamma=self.gamma,
                                           epsilon=self.epsilon, send_conn=snd))
                 self.receive_conns.append(rcv)
