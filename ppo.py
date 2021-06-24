@@ -25,15 +25,15 @@ class PPO:
         for proc in procs:
             proc.start()
         for proc in procs:
+            print("Joined")
             proc.join()
-        print("PPO ready")
 
     def gather_episodes(self, n_episodes):
         procs = list()
 
         qwe = time()
         for worker in self.workers:
-            procs.append(mp.Process(target=worker.run, args=(n_episodes, self.episodes_queue)))
+            procs.append(mp.spawn(worker.run, args=(n_episodes, self.episodes_queue)))
         ewq = time()
         for proc in procs:
             proc.start()
