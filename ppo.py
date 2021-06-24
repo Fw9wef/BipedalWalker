@@ -37,7 +37,7 @@ class PPO:
 
         episodes = list()
         for i in procs:
-            print(self.receive_conns[i].recv())
+            #print(type(self.receive_conns[i].recv()))
             episodes += self.receive_conns[i].recv()
         return episodes
 
