@@ -33,7 +33,13 @@ class PPO:
         for proc in procs:
             proc.start()
         for proc in procs:
+            print("-" * 100)
+            print("Begin join")
+            print("-" * 100)
             proc.join()
+            print("-" * 100)
+            print("Joined")
+            print("-" * 100)
 
         episodes = list()
         for i, _ in enumerate(procs):
@@ -68,7 +74,7 @@ class PPO:
     def train(self, iterations, ppo_epochs, batch_size, n_batch,  n_episodes):
         for iteration in range(1, iterations + 1):
             episodes = self.gather_episodes(n_episodes)
-            print("-"*100)
+            print("-" * 100)
             print("Gathered")
             print("-" * 100)
             sards = Episode.permute_episodes(episodes)
