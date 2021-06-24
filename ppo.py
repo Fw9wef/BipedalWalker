@@ -12,12 +12,20 @@ class PPO:
         self.lam = lam
         self.gamma = gamma
         self.epsilon = epsilon
+        self.episodes_queue = mp.Queue()
+        self.grads_queue = mp.Queue()
         self.workers = list()
         for gpu in self.gpus:
             for _ in range(self.per_gpu_workers):
                 self.workers.append(Actor(gpu_id=gpu, l=self.lam, gamma=self.gamma, epsilon=self.epsilon))
-        self.episodes_queue = mp.Queue()
-        self.grads_queue = mp.Queue()
+        policy_state_dict, value_state_dict = self.workers[0].get_weights()
+        procs = list()
+        for worker in self.workers[1:]:
+            procs.append(mp.Process(target=worker.sync_nets, args=(policy_state_dict, value_state_dict)))
+        for proc in procs:
+            proc.start()
+        for proc in procs:
+            proc.join()
 
     def gather_episodes(self, n_episodes):
         procs = list()
