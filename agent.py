@@ -113,7 +113,7 @@ class Actor(object):
 
     def run(self, n_episodes=10, send_conn=None):
         episodes = [self.run_episode() for _ in range(n_episodes)]
-        if self.send_conn is None:
+        if send_conn is None:
             return episodes
         else:
             print("-" * 100)
