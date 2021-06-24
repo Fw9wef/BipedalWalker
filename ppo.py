@@ -26,6 +26,8 @@ class PPO:
             proc.start()
         for proc in procs:
             proc.join()
+        qwe = time()
+        procs = list()
         for worker in self.workers[1:]:
             procs.append(mp.Process(target=worker.sync_nets, args=(policy_state_dict, value_state_dict)))
         for proc in procs:
@@ -33,6 +35,10 @@ class PPO:
         for proc in procs:
             print("Joined")
             proc.join()
+        asd = time()
+        print("-"*100)
+        print(asd - qwe)
+        print("-" * 100)
 
     def gather_episodes(self, n_episodes):
         procs = list()
