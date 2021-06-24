@@ -12,14 +12,14 @@ class PPO:
         self.lam = lam
         self.gamma = gamma
         self.epsilon = epsilon
-        self.receive_conns = list()
+        #self.receive_conns = list()
         self.workers = list()
         for gpu in self.gpus:
             for _ in range(self.per_gpu_workers):
-                rcv, snd = mp.Pipe()
+                #rcv, snd = mp.Pipe()
                 self.workers.append(Actor(gpu_id=gpu, l=self.lam, gamma=self.gamma,
-                                          epsilon=self.epsilon, send_conn=snd))
-                self.receive_conns.append(rcv)
+                                          epsilon=self.epsilon))#, send_conn=snd))
+                #self.receive_conns.append(rcv)
 
         policy_state_dict, value_state_dict = self.workers[0].get_weights()
         for worker in self.workers[1:]:
@@ -27,9 +27,11 @@ class PPO:
 
     def gather_episodes(self, n_episodes):
         procs = list()
-
+        rcvs = list()
         for worker in self.workers:
-            procs.append(mp.Process(target=worker.run, args=(n_episodes,)))
+            rcv, snd = mp.Pipe(False)
+            procs.append(mp.Process(target=worker.run, args=(n_episodes, snd)))
+            rcvs.append(rcv)
         for proc in procs:
             proc.start()
         for proc in procs:
@@ -43,7 +45,7 @@ class PPO:
 
         episodes = list()
         for i, _ in enumerate(procs):
-            episodes += self.receive_conns[i].recv()
+            episodes += rcvs[i].recv()
         return episodes
 
     def gather_gradients(self, batch):
