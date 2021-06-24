@@ -20,33 +20,22 @@ class PPO:
                 self.workers.append(Actor(gpu_id=gpu, l=self.lam, gamma=self.gamma, epsilon=self.epsilon))
         policy_state_dict, value_state_dict = self.workers[0].get_weights()
         procs = list()
-        for worker in self.workers[1:]:
-            procs.append(mp.Process(target=worker.sync_nets, args=(policy_state_dict, value_state_dict)))
-        for proc in procs:
-            proc.start()
-        for proc in procs:
-            proc.join()
         qwe = time()
-        procs = list()
         for worker in self.workers[1:]:
-            procs.append(mp.Process(target=worker.sync_nets, args=(policy_state_dict, value_state_dict)))
-        for proc in procs:
-            proc.start()
-        for proc in procs:
-            print("Joined")
-            proc.join()
+            worker.sync_nets(policy_state_dict, value_state_dict)
         asd = time()
-        print("-"*100)
         print(asd - qwe)
-        print("-" * 100)
+        #    procs.append(mp.Process(target=worker.sync_nets, args=(policy_state_dict, value_state_dict)))
+        #for proc in procs:
+        #    proc.start()
+        #for proc in procs:
+        #    proc.join()
 
     def gather_episodes(self, n_episodes):
         procs = list()
 
-        qwe = time()
         for worker in self.workers:
-            procs.append(mp.spawn(worker.run, args=(n_episodes, self.episodes_queue)))
-        ewq = time()
+            procs.append(mp.Process(target=worker.run, args=(n_episodes, self.episodes_queue)))
         for proc in procs:
             proc.start()
         for proc in procs:
