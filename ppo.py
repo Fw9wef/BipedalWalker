@@ -37,7 +37,6 @@ class PPO:
 
         episodes = list()
         for i, _ in enumerate(procs):
-            #print(type(self.receive_conns[i].recv()))
             episodes += self.receive_conns[i].recv()
         return episodes
 
@@ -69,6 +68,9 @@ class PPO:
     def train(self, iterations, ppo_epochs, batch_size, n_batch,  n_episodes):
         for iteration in range(1, iterations + 1):
             episodes = self.gather_episodes(n_episodes)
+            print("-"*100)
+            print("Gathered")
+            print("-" * 100)
             sards = Episode.permute_episodes(episodes)
             sards = sards[:n_batch*batch_size]
             Episode.show_episodes_stats(episodes)
