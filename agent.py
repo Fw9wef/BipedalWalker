@@ -5,6 +5,7 @@ import torch.functional as F
 import gym
 from env import *
 import math
+import sys
 
 
 class A2C_policy(nn.Module):
@@ -117,6 +118,8 @@ class Actor(object):
         else:
             print("-" * 100)
             print("Begin send")
+            print(sys.getsizeof(episodes))
+            print(sys.getsizeof(episodes[0]))
             print("-" * 100)
             send_conn.send(episodes)
             print("-" * 100)
