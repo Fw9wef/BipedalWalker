@@ -101,7 +101,6 @@ class Actor(object):
 
             if done:
                 episode.add_sard(SARD(state, state_value, action, reward, done, action_log_prob))
-                # episode.add_sard(SARD(state, state_value, action, 0, done, action_log_prob))
                 break
             else:
                 episode.add_sard(SARD(state, state_value, action, reward, done, action_log_prob))
@@ -120,7 +119,6 @@ class Actor(object):
             print("Begin send")
             print("-" * 100)
             #send_conn.send(episodes)
-            send_conn.send([0])
             print("-" * 100)
             print("End send")
             print("-" * 100)

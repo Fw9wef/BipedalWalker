@@ -34,6 +34,8 @@ class PPO:
             rcvs.append(rcv)
         for proc in procs:
             proc.start()
+
+
         for proc in procs:
             print("-" * 100)
             print("Begin join")
