@@ -35,6 +35,9 @@ class PPO:
         for proc in procs:
             proc.start()
 
+        episodes = list()
+        for i, _ in enumerate(procs):
+            episodes += rcvs[i].recv()
 
         for proc in procs:
             print("-" * 100)
@@ -45,9 +48,6 @@ class PPO:
             print("Joined")
             print("-" * 100)
 
-        episodes = list()
-        for i, _ in enumerate(procs):
-            episodes += rcvs[i].recv()
         return episodes
 
     def gather_gradients(self, batch):
