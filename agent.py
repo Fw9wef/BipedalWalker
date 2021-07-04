@@ -118,7 +118,7 @@ class Actor(object):
             print("-" * 100)
             print("Begin send")
             print("-" * 100)
-            #send_conn.send(episodes)
+            send_conn.send(episodes)
             print("-" * 100)
             print("End send")
             print("-" * 100)
