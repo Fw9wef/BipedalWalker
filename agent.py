@@ -112,6 +112,8 @@ class Actor(object):
         return episode
 
     def run(self, n_episodes=10, send_conn=None):
+        send_conn.send(0)
+        '''
         episodes = [self.run_episode() for _ in range(n_episodes)]
         if send_conn is None:
             return episodes
@@ -125,6 +127,7 @@ class Actor(object):
             print("-" * 100)
             print("End send")
             print("-" * 100)
+        '''
 
     def run_n_steps(self, n_steps):
         self.policy.eval()
