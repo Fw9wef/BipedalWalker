@@ -117,6 +117,8 @@ class Actor(object):
         if queue is None:
             return episodes
         else:
+            print("qwe", sys.getsizeof([0]))
+            print("asd", sys.getsizeof(episodes))
             #queue.put(episodes)
             queue.put([0])
 
