@@ -7,4 +7,4 @@ iterations = 10000
 ppo_epochs = 10
 batch_size = 520
 n_batch = 10
-n_episodes = 10
+n_episodes = 1
