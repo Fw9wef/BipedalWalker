@@ -53,15 +53,16 @@ class A2C_value(nn.Module):
 class Actor(object):
 
     def __init__(self, actor_net=None, critic_net=None, env_name="BipedalWalker-v3", gpu_id=0,
-                 max_iters=1600, l=0.95, gamma=0.99, epsilon=0.2, send_conn=None):
-
-        self.device = torch.device("cuda:" + str(gpu_id))
+                 max_iters=1600, l=0.95, gamma=0.99, epsilon=0.2):
+        if gpu_id != 'cpu':
+            self.device = torch.device("cuda:" + str(gpu_id))
+        else:
+            self.device = torch.device("cpu")
         self.env = gym.make(env_name)
         self.max_iters = max_iters
         self.l = l
         self.gamma = gamma
         self.epsilon = epsilon
-        self.send_conn = send_conn
 
         if actor_net is None:
             self.policy = A2C_policy(self.env.observation_space.shape, self.env.action_space.shape)
@@ -111,23 +112,18 @@ class Actor(object):
         episode.compute_advantages()
         return episode
 
-    def run(self, n_episodes=10, send_conn=None):
-        send_conn.send(0)
-        '''
+    def run(self, n_episodes=10, queue=None):
         episodes = [self.run_episode() for _ in range(n_episodes)]
-        if send_conn is None:
+        if queue is None:
             return episodes
         else:
             print("-" * 100)
             print("Begin send")
-            print(sys.getsizeof(episodes))
-            print(sys.getsizeof(episodes[0]))
             print("-" * 100)
-            send_conn.send(episodes)
+            queue.put(episodes)
             print("-" * 100)
             print("End send")
             print("-" * 100)
-        '''
 
     def run_n_steps(self, n_steps):
         self.policy.eval()
@@ -180,11 +176,12 @@ class Actor(object):
         self.value.train()
 
         states, actions, values, target_values, adv, old_log_policy = SARD.sards2tensors(sards)
-        states, actions, values, target_values, adv, old_log_policy = states.to(self.device), actions.to(self.device), \
-                                                                      values.to(self.device), target_values.to(
-            self.device), \
-                                                                      adv.to(self.device), old_log_policy.to(
-            self.device)
+        states, actions, values, target_values, adv, old_log_policy = states.to(self.device), \
+                                                                      actions.to(self.device), \
+                                                                      values.to(self.device), \
+                                                                      target_values.to(self.device), \
+                                                                      adv.to(self.device), \
+                                                                      old_log_policy.to(self.device)
 
         pred_mean = self.policy(states)
         new_log_policy = self.log_policy_prob(pred_mean, self.policy.logstd, actions)
@@ -203,10 +200,10 @@ class Actor(object):
         for param in self.value.parameters():
             value_grads.append(torch.Tensor(param.grad.cpu()))
 
-        if self.send_conn is None:
+        if queue is None:
             return policy_grads, value_grads
         else:
-            self.send_conn.send((policy_grads, value_grads))
+            queue.put((policy_grads, value_grads))
 
     def apply_grads(self, policy_grads, value_grads):
         self.policy_optimizer.zero_grad()

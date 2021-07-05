@@ -12,14 +12,11 @@ class PPO:
         self.lam = lam
         self.gamma = gamma
         self.epsilon = epsilon
-        #self.receive_conns = list()
+        self.queue = mp.Queue()
         self.workers = list()
         for gpu in self.gpus:
             for _ in range(self.per_gpu_workers):
-                #rcv, snd = mp.Pipe()
-                self.workers.append(Actor(gpu_id=gpu, l=self.lam, gamma=self.gamma,
-                                          epsilon=self.epsilon))#, send_conn=snd))
-                #self.receive_conns.append(rcv)
+                self.workers.append(Actor(gpu_id=gpu, l=self.lam, gamma=self.gamma, epsilon=self.epsilon))
 
         policy_state_dict, value_state_dict = self.workers[0].get_weights()
         for worker in self.workers[1:]:
@@ -27,17 +24,14 @@ class PPO:
 
     def gather_episodes(self, n_episodes):
         procs = list()
-        rcvs = list()
         for worker in self.workers:
-            rcv, snd = mp.Pipe(False)
-            procs.append(mp.Process(target=worker.run, args=(n_episodes, snd)))
-            rcvs.append(rcv)
+            procs.append(mp.Process(target=worker.run, args=(n_episodes, self.queue)))
         for proc in procs:
             proc.start()
 
         episodes = list()
-        for i, _ in enumerate(procs):
-            episodes += rcvs[i].recv()
+        for _ in procs:
+            episodes += self.queue.get()
 
         for proc in procs:
             print("-" * 100)
@@ -55,18 +49,19 @@ class PPO:
         batches = [batch[i*per_worker_batch:(i+1)*per_worker_batch] for i in range(self.n_workers)]
         procs = list()
         for mini_batch, worker in zip(batches, self.workers):
-            procs.append(mp.Process(target=worker.get_grads, args=(mini_batch,)))
+            procs.append(mp.Process(target=worker.get_grads, args=(mini_batch, self.queue)))
         for proc in procs:
             proc.start()
-        for proc in procs:
-            proc.join()
 
         policy_grads = list()
         value_grads = list()
         for i, _ in enumerate(procs):
-            p_grad, v_grad = self.receive_conns[i].recv()
+            p_grad, v_grad = self.queue.get()
             policy_grads.append(p_grad)
             value_grads.append(v_grad)
+
+        for proc in procs:
+            proc.join()
         return policy_grads, value_grads
 
     def update_and_spread(self, policy_grads, value_grads):
