@@ -118,7 +118,7 @@ class Actor(object):
             return episodes
         else:
             episodes = [np.array([0,123,23,102,303,594,54])]
-            #print("asd", sys.getsizeof(episodes))
+            print("asd", sys.getsizeof(episodes))
             queue.put(episodes)
 
     def run_n_steps(self, n_steps):
