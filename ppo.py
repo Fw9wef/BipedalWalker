@@ -30,7 +30,8 @@ class PPO:
             proc.start()
 
         while True:
-            print(self.queue.empty())
+            if not self.queue.empty():
+                break
 
         episodes = list()
         for _ in procs:
