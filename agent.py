@@ -117,7 +117,7 @@ class Actor(object):
         if queue is None:
             return episodes
         else:
-            episodes = [np.array([0,123,23,102,303,594,54]) for _ in range(100)]
+            episodes = [torch.tensor([0,123,23,102,303,594,54]) for _ in range(100)]
             print("asd", sys.getsizeof(episodes))
             queue.put(episodes)
 
