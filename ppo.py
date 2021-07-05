@@ -31,7 +31,13 @@ class PPO:
 
         episodes = list()
         for _ in procs:
+            print("-" * 100)
+            print("Begin get")
+            print("-" * 100)
             episodes += self.queue.get()
+            print("-" * 100)
+            print("End get")
+            print("-" * 100)
 
         for proc in procs:
             print("-" * 100)
