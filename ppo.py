@@ -39,6 +39,9 @@ class PPO:
             print("End get")
             print("-" * 100)
 
+        while True:
+            print(self.queue.empty())
+
         for proc in procs:
             print("-" * 100)
             print("Begin join")
