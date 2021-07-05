@@ -117,13 +117,8 @@ class Actor(object):
         if queue is None:
             return episodes
         else:
-            print("-" * 100)
-            print("Begin send")
-            print("-" * 100)
-            queue.put(episodes)
-            print("-" * 100)
-            print("End send")
-            print("-" * 100)
+            #queue.put(episodes)
+            queue.put([0])
 
     def run_n_steps(self, n_steps):
         self.policy.eval()

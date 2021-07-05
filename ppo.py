@@ -29,10 +29,6 @@ class PPO:
         for proc in procs:
             proc.start()
 
-        while True:
-            if not self.queue.empty():
-                break
-
         episodes = list()
         for _ in procs:
             print("-" * 100)
