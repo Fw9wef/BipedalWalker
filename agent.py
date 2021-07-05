@@ -117,10 +117,10 @@ class Actor(object):
         if queue is None:
             return episodes
         else:
-            print("qwe", sys.getsizeof([i for i in range(100000000)]))
+            print("qwe", sys.getsizeof([i for i in range(10)]))
             print("asd", sys.getsizeof(episodes))
             #queue.put(episodes)
-            queue.put([i for i in range(100000000)])
+            queue.put([i for i in range(10)])
 
     def run_n_steps(self, n_steps):
         self.policy.eval()
