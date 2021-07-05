@@ -120,7 +120,7 @@ class Actor(object):
             print("qwe", sys.getsizeof([i for i in range(100000000)]))
             print("asd", sys.getsizeof(episodes))
             #queue.put(episodes)
-            queue.put([i for i in range(1e8)])
+            queue.put([i for i in range(100000000)])
 
     def run_n_steps(self, n_steps):
         self.policy.eval()
