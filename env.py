@@ -67,9 +67,6 @@ class Episode:
             chosen_sards = self.sards
         return chosen_sards
 
-    def send_episode(self, send_conn):
-        pass
-
     @staticmethod
     def get_random_sard_from_episodes(episodes, per_episode_sards):
         sards = list()

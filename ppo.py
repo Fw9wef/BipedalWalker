@@ -31,7 +31,9 @@ class PPO:
 
         episodes = list()
         for _ in procs:
-            episodes += self.queue.get()
+            q = self.queue.get()
+            print("GET")
+            episodes += q
 
         for proc in procs:
             proc.join()
