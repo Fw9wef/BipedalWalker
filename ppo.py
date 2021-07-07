@@ -27,7 +27,7 @@ class PPO:
         for worker in self.workers[1:]:
             worker.sync_nets(policy_state_dict, value_state_dict)
 
-    def gather_episodes(self, n_episodes):
+    """def gather_episodes(self, n_episodes):
         tot_a = time()
         a = time()
         procs = list()
@@ -52,6 +52,13 @@ class PPO:
             proc.join()
         tot_b = time()
         print("Total time: ", tot_b-tot_a)
+        return episodes"""
+
+    def gather_episodes(self, n_episodes):
+        tot_a = time()
+        episodes = self.workers[0].run(n_episodes)
+        tot_b = time()
+        print("Total time: ", tot_b - tot_a)
         return episodes
 
     def gather_gradients(self, batch):
