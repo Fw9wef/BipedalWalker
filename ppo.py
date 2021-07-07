@@ -46,7 +46,7 @@ class PPO:
         for _ in range(n_episodes * len(procs)):
             sards, stats, s_t = queue.get()
             r_t = time()
-            print("Queue time: ", r_t - s_t, "Size: ", sys.getsizeof(eps), "Len: ", len(eps[0]))
+            print("Queue time: ", r_t - s_t, "Size: ", sys.getsizeof(sards), "Len: ", len(sards))
             ret_sards += sards
             ret_stats.append(stats)
         b = time()
