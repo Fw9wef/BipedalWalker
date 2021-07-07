@@ -8,6 +8,8 @@ import math
 import sys
 from time import time
 
+gym.logger.set_level(40)
+
 
 class A2C_policy(nn.Module):
     '''
@@ -123,9 +125,9 @@ class Actor(object):
             stats = episode.get_episodes_stats([episode])
             sards = episode.get_random_sards(n_sards)
 
-            a = time()
-            queue.put((sards, stats, a))
-            print("Put to queue")
+            #a = time()
+            queue.put((sards, stats))
+            #print("Put to queue")
         event.wait()
 
     def run_n_steps(self, n_steps):
