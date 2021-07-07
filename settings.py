@@ -8,3 +8,4 @@ ppo_epochs = 10
 batch_size = 128
 n_batch = 64
 n_episodes = 8
+n_steps = 2048

@@ -110,8 +110,7 @@ class PPO:
         for worker in self.workers[1:]:
             worker.sync_nets(policy_state_dict, value_state_dict)
 
-
-    def train(self, iterations, ppo_epochs, batch_size, n_batch, n_episodes):
+    def train_multiproc(self, iterations, ppo_epochs, batch_size, n_batch, n_episodes):
         n_sards = int(batch_size*n_batch/n_episodes/len(self.workers))
         print("Per episode sards: ", n_sards)
         for iteration in range(1, iterations + 1):
@@ -129,3 +128,15 @@ class PPO:
                     self.workers[0].apply_grads([policy_grads], [value_grads])
                     #self.update_and_spread([policy_grads], [value_grads])
             self.spread()
+
+        def train(self, iterations, ppo_epochs, batch_size, n_steps):
+            for iteration in range(1, iterations + 1):
+                episodes = [self.workers[0].run_n_steps(n_steps)]
+                episodes[0].show_stats()
+
+                for ppo_iter in range(ppo_epochs):
+                    sards = np.random.permutation(episodes[0].sards)
+                    for batch in range(n_steps // batch_size):
+                        sards_batch = sards[batch * batch_size: (batch + 1) * batch_size]
+                        policy_grads, value_grads = self.workers[0].get_grads(sards_batch)
+                        self.workers[0].apply_grads([policy_grads], [value_grads])
