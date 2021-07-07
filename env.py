@@ -45,7 +45,7 @@ class Episode:
 
     def add_sard(self, sard):
         self.sards.append(sard)
-        self.ep_reward += self.sards[-1].reward
+        self.ep_reward += 100 * self.sards[-1].reward
 
     def compute_advantages(self, l=0.95, gamma=0.99):
         run_adv = 0
