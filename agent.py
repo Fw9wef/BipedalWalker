@@ -98,6 +98,7 @@ class Actor(object):
             state, state_value, action_log_prob = state.detach().cpu(), state_value.detach().cpu(), \
                                                   action_log_prob.detach().cpu()
 
+            reward = 0.01 * reward
             if done:
                 episode.add_sard(SARD(state, state_value, action, reward, done, action_log_prob))
                 break
@@ -195,6 +196,7 @@ class Actor(object):
         pred_values = self.value(states)
         loss_v = F.mse_loss(target_values, pred_values)
         loss_v.backward()
+        print("Loss p: %.6f\tLoss v: %.6f" % (pg_loss.cpu().item(), loss_v.cpu().item()))
         value_grads = list()
         for param in self.value.parameters():
             value_grads.append(torch.Tensor(param.grad.cpu()))
