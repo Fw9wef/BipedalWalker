@@ -122,6 +122,7 @@ class Actor(object):
             #print("asd", sys.getsizeof(episodes))
             a = time()
             queue.put((episodes, a))
+            print("Put to queue")
             event.wait()
 
     def run_n_steps(self, n_steps):
