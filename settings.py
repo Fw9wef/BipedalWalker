@@ -1,4 +1,4 @@
-per_gpu_workers = 16
+per_gpu_workers = 1
 gpus = 'cpu'
 lam = 0.95
 gamma = 0.99
