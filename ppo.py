@@ -127,4 +127,3 @@ class PPO:
                     self.workers[0].apply_grads([policy_grads], [value_grads])
                     #self.update_and_spread([policy_grads], [value_grads])
             self.spread()
-            print("Step Done")

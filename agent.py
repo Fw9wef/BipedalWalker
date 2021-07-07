@@ -19,12 +19,12 @@ class A2C_policy(nn.Module):
         super(A2C_policy, self).__init__()
 
         self.lp = nn.Sequential(
-            nn.Linear(input_shape[0], 512),
+            nn.Linear(input_shape[0], 64),
             nn.ReLU(),
-            nn.Linear(512, 512),
+            nn.Linear(64, 64),
             nn.ReLU())
 
-        self.mean_l = nn.Linear(512, n_actions[0])
+        self.mean_l = nn.Linear(64, n_actions[0])
         #self.mean_l.weight.data.mul_(0.1)
 
         #self.logstd = nn.Parameter(torch.zeros(n_actions[0]))
@@ -43,11 +43,11 @@ class A2C_value(nn.Module):
         super(A2C_value, self).__init__()
 
         self.lp = nn.Sequential(
-            nn.Linear(input_shape[0], 512),
+            nn.Linear(input_shape[0], 64),
             nn.ReLU(),
-            nn.Linear(512, 512),
+            nn.Linear(64, 64),
             nn.ReLU(),
-            nn.Linear(512, 1))
+            nn.Linear(64, 1))
 
     def forward(self, x):
         return self.lp(x.float())
