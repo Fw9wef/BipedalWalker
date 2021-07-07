@@ -8,7 +8,7 @@ import math
 import sys
 from time import time
 
-gym.logger.set_level(40)
+#gym.logger.set_level(40)
 
 
 class A2C_policy(nn.Module):
@@ -61,6 +61,7 @@ class Actor(object):
             self.device = torch.device("cuda:" + str(gpu_id))
         else:
             self.device = torch.device("cpu")
+        print("Actor init call")
         self.env = gym.make(env_name)
         self.max_iters = max_iters
         self.l = l
