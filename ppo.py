@@ -3,6 +3,7 @@ from env import *
 import torch.multiprocessing as mp
 from time import time
 from copy import deepcopy
+import sys
 
 
 class PPO:
@@ -44,7 +45,7 @@ class PPO:
         for _ in procs:
             eps, s_t = queue.get()
             r_t = time()
-            print("Queue time", r_t - s_t)
+            print("Queue time: ", r_t - s_t, "Size: ", sys.getsizeof(eps))
             ret_episodes += eps
         b = time()
         print("Generated: ", b-a)
