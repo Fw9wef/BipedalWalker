@@ -119,4 +119,4 @@ class PPO:
                     mini_batch = sards[batch * batch_size: (batch + 1) * batch_size]
                     policy_grads, value_grads = self.workers[0].get_grads(mini_batch)
                     #self.workers[0].apply_grads(policy_grads, value_grads)
-                    self.update_and_spread(policy_grads, value_grads)
+                    self.update_and_spread([policy_grads], [value_grads])
