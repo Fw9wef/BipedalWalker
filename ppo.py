@@ -24,6 +24,7 @@ class PPO:
             worker.sync_nets(policy_state_dict, value_state_dict)
 
     def gather_episodes(self, n_episodes):
+        tot_a = time()
         a = time()
         procs = list()
         event = mp.Event()
@@ -36,14 +37,17 @@ class PPO:
         ret_episodes = list()
         for _ in procs:
             ret_episodes += self.queue.get()
-
+        a = time()
         episodes = deepcopy(ret_episodes)
         del ret_episodes
         event.set()
+        b = time()
+        print("Copied: ", b-a)
 
         for proc in procs:
             proc.join()
-
+        tot_b = time()
+        print("Total time: ", tot_b-tot_a)
         return episodes
 
     def gather_gradients(self, batch):
