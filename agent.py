@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 from torch import optim
-import torch.functional as F
+import torch.nn.functional as F
 import gym
 from env import *
 import math
