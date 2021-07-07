@@ -8,7 +8,7 @@ import math
 import sys
 from time import time
 
-#gym.logger.set_level(40)
+gym.logger.set_level(40)
 
 
 class A2C_policy(nn.Module):
