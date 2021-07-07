@@ -2,6 +2,7 @@ from agent import Actor
 from env import *
 import torch.multiprocessing as mp
 from time import time
+from copy import deepcopy
 
 
 class PPO:
@@ -24,16 +25,19 @@ class PPO:
 
     def gather_episodes(self, n_episodes):
         procs = list()
+        event = mp.Event()
         for worker in self.workers:
-            procs.append(mp.Process(target=worker.run, args=(n_episodes, self.queue)))
+            procs.append(mp.Process(target=worker.run, args=(n_episodes, self.queue, event)))
         for proc in procs:
             proc.start()
 
-        episodes = list()
+        ret_episodes = list()
         for _ in procs:
-            q = self.queue.get()
-            print("GET")
-            episodes += q
+            ret_episodes += self.queue.get()
+
+        episodes = deepcopy(ret_episodes)
+        del ret_episodes
+        event.set()
 
         for proc in procs:
             proc.join()

@@ -112,14 +112,15 @@ class Actor(object):
         episode.compute_advantages()
         return episode
 
-    def run(self, n_episodes=10, queue=None):
+    def run(self, n_episodes=10, queue=None, event=None):
         episodes = [self.run_episode() for _ in range(n_episodes)]
         if queue is None:
             return episodes
         else:
-            episodes = [torch.tensor([0,123,23,102,303,594,54]) for _ in range(100)]
-            print("asd", sys.getsizeof(episodes))
+            #episodes = [torch.tensor([0, 123, 23, 102, 303, 594, 54]) for _ in range(100)]
+            #print("asd", sys.getsizeof(episodes))
             queue.put(episodes)
+            event.wait()
 
     def run_n_steps(self, n_steps):
         self.policy.eval()
