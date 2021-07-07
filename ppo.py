@@ -4,6 +4,7 @@ import torch.multiprocessing as mp
 from time import time
 from copy import deepcopy
 import sys
+import numpy as np
 
 
 class PPO:
@@ -115,6 +116,7 @@ class PPO:
         print("Per episode sards: ", n_sards)
         for iteration in range(1, iterations + 1):
             sards, stats = self.gather_sards(n_episodes, n_sards)
+            sards = np.random.permutation(sards)
             #print("-" * 100)
             #print("Gathered")
             #print("-" * 100)
