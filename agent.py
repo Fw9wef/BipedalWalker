@@ -196,7 +196,7 @@ class Actor(object):
         pred_values = self.value(states)
         loss_v = F.mse_loss(target_values, pred_values)
         loss_v.backward()
-        print("Loss p: %.6f\tLoss v: %.6f" % (pg_loss.cpu().item(), loss_v.cpu().item()))
+        #print("Loss p: %.6f\tLoss v: %.6f" % (pg_loss.cpu().item(), loss_v.cpu().item()))
         value_grads = list()
         for param in self.value.parameters():
             value_grads.append(torch.Tensor(param.grad.cpu()))
