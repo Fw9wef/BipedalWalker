@@ -27,32 +27,35 @@ class PPO:
         for worker in self.workers[1:]:
             worker.sync_nets(policy_state_dict, value_state_dict)
 
-    def gather_episodes(self, n_episodes):
+    def gather_sards(self, n_episodes, n_sards):
         tot_a = time()
         a = time()
         procs = list()
         queue = mp.Queue()
         event = mp.Event()
         for worker in self.workers:
-            procs.append(mp.Process(target=worker.run, args=(n_episodes, queue, event)))
+            procs.append(mp.Process(target=worker.run, args=(n_episodes, n_sards, queue, event)))
         for proc in procs:
             proc.start()
         b = time()
         print("Started: ", b-a)
 
         a = time()
-        ret_episodes = list()
-        for _ in procs:
-            eps, s_t = queue.get()
+        ret_sards = list()
+        ret_stats = list()
+        for _ in range(n_episodes * len(procs)):
+            sards, stats, s_t = queue.get()
             r_t = time()
             print("Queue time: ", r_t - s_t, "Size: ", sys.getsizeof(eps), "Len: ", len(eps[0]))
-            ret_episodes += eps
+            ret_sards += sards
+            ret_stats.append(stats)
         b = time()
         print("Generated: ", b-a)
 
         a = time()
-        episodes = deepcopy(ret_episodes)
-        del ret_episodes
+        sards = deepcopy(ret_sards)
+        stats = deepcopy(ret_stats)
+        del ret_sards, ret_stats
         event.set()
         b = time()
         print("Copied: ", b-a)
@@ -65,7 +68,7 @@ class PPO:
 
         tot_b = time()
         print("Total time: ", tot_b-tot_a)
-        return episodes
+        return sards, stats
 
     """
     def gather_episodes(self, n_episodes):
@@ -102,14 +105,14 @@ class PPO:
             worker.sync_nets(policy_state_dict, value_state_dict)
 
     def train(self, iterations, ppo_epochs, batch_size, n_batch, n_episodes):
+        n_sards = int(batch_size*n_batch/n_episodes/len(self.workers))
+        print("Per episode sards: ", n_sards)
         for iteration in range(1, iterations + 1):
-            episodes = self.gather_episodes(n_episodes)
+            sards, stats = self.gather_sards(n_episodes, n_sards)
             print("-" * 100)
             print("Gathered")
             print("-" * 100)
-            sards = Episode.permute_episodes(episodes)
-            sards = sards[:n_batch*batch_size]
-            Episode.show_episodes_stats(episodes)
+            Episode.average_stats_and_show(stats)
 
             """
             for ppo_iter in range(ppo_epochs):

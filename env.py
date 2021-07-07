@@ -102,6 +102,16 @@ class Episode:
         print("Reward mean: %.6f  |  Reward std: %.6f  |  Len mean: %.6f  |  Len std: %.6f" % \
               (stats["reward_mean"], stats["reward_std"], stats["len_mean"], stats["len_std"]))
 
+    @staticmethod
+    def average_stats_and_show(stats):
+        rewards = list()
+        lens = list()
+        for s in stats:
+            rewards.append(s['reward_mean'])
+            lens.append(s['len_mean'])
+        print("Reward mean: %.6f  |  Reward std: %.6f  |  Len mean: %.6f  |  Len std: %.6f" % \
+              (np.mean(rewards), np.std(rewards), np.mean(lens), np.std(lens)))
+
 
 class Sequence:
     def __init__(self):

@@ -113,15 +113,18 @@ class Actor(object):
         episode.compute_advantages()
         return episode
 
-    def run(self, n_episodes=10, queue=None, event=None):
-        episodes = [self.run_episode() for _ in range(n_episodes)]
+    def run(self, n_episodes=10, n_sards = None, queue=None, event=None):
         if queue is None:
+            episodes = [self.run_episode() for _ in range(n_episodes)]
             return episodes
-        else:
-            #episodes = [torch.tensor([0, 123, 23, 102, 303, 594, 54]) for _ in range(100)]
-            #print("asd", sys.getsizeof(episodes))
+
+        for _ in range(n_episodes):
+            episode = self.run_episode()
+            stats = episode.get_episodes_stats([episode])
+            sards = episode.get_random_sards(n_sards)
+
             a = time()
-            queue.put((episodes, a))
+            queue.put((sards, stats, a))
             print("Put to queue")
             event.wait()
 
