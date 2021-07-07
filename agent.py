@@ -12,9 +12,6 @@ gym.logger.set_level(40)
 
 
 class A2C_policy(nn.Module):
-    '''
-    Actor neural network
-    '''
     def __init__(self, input_shape, n_actions):
         super(A2C_policy, self).__init__()
 
@@ -36,9 +33,6 @@ class A2C_policy(nn.Module):
 
 
 class A2C_value(nn.Module):
-    '''
-    Critic neural network
-    '''
     def __init__(self, input_shape):
         super(A2C_value, self).__init__()
 
@@ -61,7 +55,6 @@ class Actor(object):
             self.device = torch.device("cuda:" + str(gpu_id))
         else:
             self.device = torch.device("cpu")
-        print("Actor init call")
         self.env = gym.make(env_name)
         self.max_iters = max_iters
         self.l = l
@@ -116,7 +109,7 @@ class Actor(object):
         episode.compute_advantages()
         return episode
 
-    def run(self, n_episodes=10, n_sards = None, queue=None, event=None):
+    def run(self, n_episodes=10, n_sards=None, queue=None, event=None):
         if queue is None:
             episodes = [self.run_episode() for _ in range(n_episodes)]
             return episodes
