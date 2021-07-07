@@ -104,6 +104,12 @@ class PPO:
         for worker in self.workers[1:]:
             worker.sync_nets(policy_state_dict, value_state_dict)
 
+    def spread(self):
+        policy_state_dict, value_state_dict = self.workers[0].get_weights()
+        for worker in self.workers[1:]:
+            worker.sync_nets(policy_state_dict, value_state_dict)
+
+
     def train(self, iterations, ppo_epochs, batch_size, n_batch, n_episodes):
         n_sards = int(batch_size*n_batch/n_episodes/len(self.workers))
         print("Per episode sards: ", n_sards)
@@ -118,6 +124,7 @@ class PPO:
                 for batch in range(len(sards) // batch_size):
                     mini_batch = sards[batch * batch_size: (batch + 1) * batch_size]
                     policy_grads, value_grads = self.workers[0].get_grads(mini_batch)
-                    #self.workers[0].apply_grads(policy_grads, value_grads)
-                    self.update_and_spread([policy_grads], [value_grads])
-                    print("Step Done")
+                    self.workers[0].apply_grads([policy_grads], [value_grads])
+                    #self.update_and_spread([policy_grads], [value_grads])
+            self.spread()
+            print("Step Done")
