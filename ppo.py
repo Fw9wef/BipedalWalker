@@ -97,9 +97,9 @@ class PPO:
         for worker in self.workers[1:]:
             worker.sync_nets(policy_state_dict, value_state_dict)
 
-    def train(self, iterations, ppo_epochs, batch_size, n_batch):
+    def train(self, iterations, ppo_epochs, batch_size, n_batch, n_episodes):
         for iteration in range(1, iterations + 1):
-            episodes = self.gather_episodes()
+            episodes = self.gather_episodes(n_episodes)
             print("-" * 100)
             print("Gathered")
             print("-" * 100)
