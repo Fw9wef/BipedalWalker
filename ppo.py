@@ -15,9 +15,13 @@ class PPO:
         self.epsilon = epsilon
         self.queue = mp.Queue()
         self.workers = list()
-        for gpu in self.gpus:
+        if gpus != 'cpu':
+            for gpu in self.gpus:
+                for _ in range(self.per_gpu_workers):
+                    self.workers.append(Actor(gpu_id=gpu, l=self.lam, gamma=self.gamma, epsilon=self.epsilon))
+        else:
             for _ in range(self.per_gpu_workers):
-                self.workers.append(Actor(gpu_id=gpu, l=self.lam, gamma=self.gamma, epsilon=self.epsilon))
+                self.workers.append(Actor(gpu_id='cpu', l=self.lam, gamma=self.gamma, epsilon=self.epsilon))
 
         policy_state_dict, value_state_dict = self.workers[0].get_weights()
         for worker in self.workers[1:]:
