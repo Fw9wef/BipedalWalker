@@ -6,6 +6,7 @@ import gym
 from env import *
 import math
 import sys
+from time import time
 
 
 class A2C_policy(nn.Module):
@@ -119,7 +120,8 @@ class Actor(object):
         else:
             #episodes = [torch.tensor([0, 123, 23, 102, 303, 594, 54]) for _ in range(100)]
             #print("asd", sys.getsizeof(episodes))
-            queue.put(episodes)
+            a = time()
+            queue.put((episodes, a))
             event.wait()
 
     def run_n_steps(self, n_steps):
