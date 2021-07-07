@@ -120,3 +120,4 @@ class PPO:
                     policy_grads, value_grads = self.workers[0].get_grads(mini_batch)
                     #self.workers[0].apply_grads(policy_grads, value_grads)
                     self.update_and_spread([policy_grads], [value_grads])
+                    print("Step Done")
