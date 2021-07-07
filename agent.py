@@ -126,7 +126,7 @@ class Actor(object):
             a = time()
             queue.put((sards, stats, a))
             print("Put to queue")
-            event.wait()
+        event.wait()
 
     def run_n_steps(self, n_steps):
         self.policy.eval()
