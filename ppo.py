@@ -45,7 +45,7 @@ class PPO:
         for _ in procs:
             eps, s_t = queue.get()
             r_t = time()
-            print("Queue time: ", r_t - s_t, "Size: ", sys.getsizeof(eps))
+            print("Queue time: ", r_t - s_t, "Size: ", sys.getsizeof(eps), "Len: ", len(eps[0]))
             ret_episodes += eps
         b = time()
         print("Generated: ", b-a)
