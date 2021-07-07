@@ -6,7 +6,7 @@ from copy import deepcopy
 
 
 class PPO:
-    def __init__(self, per_gpu_workers=1, gpus=[0], lam=0.95, gamma=0.99, epsilon=0.2, n_episodes=1):
+    def __init__(self, per_gpu_workers=1, gpus=[0], lam=0.95, gamma=0.99, epsilon=0.2):
         self.per_gpu_workers = per_gpu_workers
         self.gpus = gpus
         self.n_workers = self.per_gpu_workers * len(self.gpus)
@@ -26,33 +26,39 @@ class PPO:
         for worker in self.workers[1:]:
             worker.sync_nets(policy_state_dict, value_state_dict)
 
-        self.queue = mp.Queue()
-        self.event = mp.Event()
-        self.procs = list()
-        for worker in self.workers:
-            self.procs.append(mp.Process(target=worker.run, args=(n_episodes, self.queue, self.event)))
-
-    def gather_episodes(self):
-        self.event.clear()
+    def gather_episodes(self, n_episodes):
         tot_a = time()
         a = time()
-        for proc in self.procs:
+        procs = list()
+        queue = mp.Queue()
+        event = mp.Event()
+        for worker in self.workers:
+            procs.append(mp.Process(target=worker.run, args=(n_episodes, queue, event)))
+        for proc in procs:
             proc.start()
         b = time()
         print("Started: ", b-a)
 
+        a = time()
         ret_episodes = list()
-        for _ in self.procs:
-            ret_episodes += self.queue.get()
+        for _ in procs:
+            ret_episodes += queue.get()
+        b = time()
+        print("Generated: ", b-a)
+
         a = time()
         episodes = deepcopy(ret_episodes)
         del ret_episodes
-        self.event.set()
-
+        event.set()
         b = time()
         print("Copied: ", b-a)
-        for proc in self.procs:
+
+        a = time()
+        for proc in procs:
             proc.join()
+        b = time()
+        print("Joined: ", b-a)
+
         tot_b = time()
         print("Total time: ", tot_b-tot_a)
         return episodes
