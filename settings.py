@@ -1,4 +1,4 @@
-per_gpu_workers = 10
+per_gpu_workers = 4
 gpus = [0]
 lam = 0.95
 gamma = 0.99
@@ -6,5 +6,5 @@ epsilon = 0.2
 iterations = 10000
 ppo_epochs = 10
 batch_size = 128
-n_batch = 10
+n_batch = 5
 n_episodes = 1
