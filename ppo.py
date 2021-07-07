@@ -30,7 +30,7 @@ class PPO:
         tot_a = time()
         a = time()
         procs = list()
-        queue = mp.Manager().Queue()
+        queue = mp.Queue()
         event = mp.Event()
         for worker in self.workers:
             procs.append(mp.Process(target=worker.run, args=(n_episodes, queue, event)))
