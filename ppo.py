@@ -24,13 +24,15 @@ class PPO:
             worker.sync_nets(policy_state_dict, value_state_dict)
 
     def gather_episodes(self, n_episodes):
+        a = time()
         procs = list()
         event = mp.Event()
         for worker in self.workers:
             procs.append(mp.Process(target=worker.run, args=(n_episodes, self.queue, event)))
         for proc in procs:
             proc.start()
-
+        b = time()
+        print("Started: ", b-a)
         ret_episodes = list()
         for _ in procs:
             ret_episodes += self.queue.get()
