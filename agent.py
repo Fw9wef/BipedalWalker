@@ -197,7 +197,7 @@ class Actor(object):
         pg_loss.backward()
         policy_grads = list()
         for param in self.policy.parameters():
-            policy_grads.append(torch.Tensor(param.grad.cpu().copy()))
+            policy_grads.append(torch.Tensor(param.grad.cpu().clone()))
 
         pred_values = self.value(states)
         loss_v = F.mse_loss(target_values, pred_values)
@@ -205,7 +205,7 @@ class Actor(object):
         #print("Loss p: %.6f\tLoss v: %.6f" % (pg_loss.cpu().item(), loss_v.cpu().item()))
         value_grads = list()
         for param in self.value.parameters():
-            value_grads.append(torch.Tensor(param.grad.cpu().copy()))
+            value_grads.append(torch.Tensor(param.grad.cpu().clone()))
 
         if queue is None:
             return policy_grads, value_grads
