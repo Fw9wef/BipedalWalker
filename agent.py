@@ -113,6 +113,12 @@ class Actor(object):
     def run(self, n_episodes=10, n_sards=None, queue=None, event=None):
         if queue is None:
             episodes = [self.run_episode() for _ in range(n_episodes)]
+            with torch.no_grad():
+                control_input = torch.tensor([1 for i in range(24)]).to(self.device)
+                p_out = self.policy(control_input)
+                v_out = self.value(control_input)
+                to_print = [x for x in p_out.cpu().numpy()] + [x for x in v_out.cpu().numpy()]
+                print(to_print)
             return episodes
 
         for _ in range(n_episodes):
