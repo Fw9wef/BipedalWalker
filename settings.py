@@ -1,5 +1,5 @@
 per_gpu_workers = 4
-gpus = [0]
+gpus = "cpu"
 lam = 0.95
 gamma = 0.99
 epsilon = 0.2
