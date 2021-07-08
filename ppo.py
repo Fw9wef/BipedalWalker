@@ -1,9 +1,7 @@
 from agent import Actor
 from env import *
 import torch.multiprocessing as mp
-from time import time
 from copy import deepcopy
-import sys
 import numpy as np
 
 
@@ -29,8 +27,6 @@ class PPO:
             worker.sync_nets(policy_state_dict, value_state_dict)
 
     def gather_sards(self, n_episodes, n_sards):
-        #tot_a = time()
-        #a = time()
         procs = list()
         queue = mp.Queue()
         event = mp.Event()
@@ -38,47 +34,20 @@ class PPO:
             procs.append(mp.Process(target=worker.run, args=(n_episodes, n_sards, queue, event)))
         for proc in procs:
             proc.start()
-        #b = time()
-        #print("Started: ", b-a)
-
-        #a = time()
         ret_sards = list()
         ret_stats = list()
         for _ in range(n_episodes * len(procs)):
             sards, stats = queue.get()
-            #r_t = time()
-            #print("Queue time: ", r_t - s_t, "Size: ", sys.getsizeof(sards), "Len: ", len(sards))
             ret_sards += sards
             ret_stats.append(stats)
-        #b = time()
-        #print("Generated: ", b-a)
-
-        #a = time()
         sards = deepcopy(ret_sards)
         stats = deepcopy(ret_stats)
         del ret_sards, ret_stats
         event.set()
-        #b = time()
-        #print("Copied: ", b-a)
-
-        #a = time()
         for proc in procs:
             proc.join()
-        #b = time()
-        #print("Joined: ", b-a)
-
-        #tot_b = time()
-        #print("Total time: ", tot_b-tot_a)
         return sards, stats
 
-    """
-    def gather_episodes(self, n_episodes):
-        tot_a = time()
-        episodes = self.workers[0].run(n_episodes)
-        tot_b = time()
-        print("Total time: ", tot_b - tot_a)
-        return episodes
-        """
     def gather_gradients(self, batch):
         per_worker_batch = len(batch) // self.n_workers
         batches = [batch[i*per_worker_batch:(i+1)*per_worker_batch] for i in range(self.n_workers)]

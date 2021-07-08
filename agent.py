@@ -124,6 +124,11 @@ class Actor(object):
             queue.put((sards, stats))
             #print("Put to queue")
         event.wait()
+        control_input = torch.tensor([1 for i in range(24)]).to(self.device)
+        p_out = self.policy(control_input)
+        v_out = self.value(control_input)
+        to_print = [x for x in p_out.cpu().numpy()] + [x for x in v_out.cpu().numpy()]
+        print(to_print)
 
     def run_n_steps(self, n_steps):
         self.policy.eval()
