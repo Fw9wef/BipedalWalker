@@ -118,3 +118,4 @@ class PPO:
                     sards_batch = sards[batch * batch_size: (batch + 1) * batch_size]
                     policy_grads, value_grads = self.workers[0].get_grads(sards_batch)
                     self.workers[0].apply_grads([policy_grads], [value_grads])
+                    print(policy_grads)
