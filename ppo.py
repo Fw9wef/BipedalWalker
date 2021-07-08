@@ -76,8 +76,8 @@ class PPO:
 
     def spread(self):
         policy_state_dict, value_state_dict = self.workers[0].get_weights()
-        for worker in self.workers[1:]:
-            worker.sync_nets(policy_state_dict, value_state_dict)
+        for i, worker in enumerate(self.workers[1:]):
+            self.workers[i+1].sync_nets(policy_state_dict, value_state_dict)
 
     def train_multiproc(self, iterations, ppo_epochs, batch_size, n_batch, n_episodes):
         n_sards = int(batch_size*n_batch/n_episodes/len(self.workers))
