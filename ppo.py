@@ -95,16 +95,6 @@ class PPO:
                     mini_batch = sards[batch * batch_size: (batch + 1) * batch_size]
                     policy_grads, value_grads = self.workers[0].get_grads(mini_batch)
                     self.workers[0].apply_grads([policy_grads], [value_grads])
-                    #self.update_and_spread([policy_grads], [value_grads])
-                    print(policy_grads)
-                '''
-                with torch.no_grad():
-                    control_input = torch.tensor([1 for i in range(24)]).to(self.workers[0].device)
-                    p_out = self.workers[0].policy(control_input)
-                    v_out = self.workers[0].value(control_input)
-                    to_print = [x for x in p_out.cpu().numpy()] + [x for x in v_out.cpu().numpy()]
-                    print(to_print)
-                '''
             self.spread()
 
     def train(self, iterations, ppo_epochs, batch_size, n_steps):
@@ -118,4 +108,3 @@ class PPO:
                     sards_batch = sards[batch * batch_size: (batch + 1) * batch_size]
                     policy_grads, value_grads = self.workers[0].get_grads(sards_batch)
                     self.workers[0].apply_grads([policy_grads], [value_grads])
-                    print(policy_grads)
