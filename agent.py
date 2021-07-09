@@ -24,8 +24,8 @@ class A2C_policy(nn.Module):
         self.mean_l = nn.Linear(64, n_actions[0])
         #self.mean_l.weight.data.mul_(0.1)
 
-        #self.logstd = nn.Parameter(torch.zeros(n_actions[0]))
-        self.register_buffer("logstd", -0.5*torch.ones(n_actions[0]))
+        self.logstd = nn.Parameter(torch.zeros(n_actions[0]))
+        #self.register_buffer("logstd", -0.5*torch.ones(n_actions[0]))
 
     def forward(self, x):
         ot_n = self.lp(x.float())
